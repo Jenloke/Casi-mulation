@@ -1,0 +1,275 @@
+:root {
+  color-scheme: dark;
+  --bg: #0b0d12;
+  --sidebar: #10131b;
+  --panel: #161a26;
+  --border: #272d3f;
+  --text: #ece8dd;
+  --muted: #9aa0b4;
+  --accent: #e6b84a;
+  --win: #6fdc8c;
+  --loss: #ff7b7b;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  height: 100%;
+}
+
+.stage {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.phaser-host {
+  position: absolute;
+  inset: 0;
+}
+
+.topbar {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  align-items: center;
+  padding: 8px 14px;
+  background: rgb(22 26 38 / 0.88);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  pointer-events: none;
+}
+
+.brand {
+  color: var(--accent);
+  letter-spacing: 0.04em;
+}
+
+.chips {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.status {
+  margin-left: auto;
+  text-transform: capitalize;
+}
+
+.status.online {
+  color: var(--win);
+}
+
+.status.offline {
+  color: var(--loss);
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  overflow-y: auto;
+  background: var(--sidebar);
+  border-left: 1px solid var(--border);
+}
+
+.panel {
+  padding: 12px 14px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.panel h2 {
+  margin: 0 0 10px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.muted,
+.hint {
+  color: var(--muted);
+}
+
+.hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+}
+
+p {
+  margin: 4px 0;
+}
+
+button {
+  font: inherit;
+  color: var(--text);
+  background: #232a3b;
+  border: 1px solid #353d54;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: #2d3550;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+button[aria-pressed="true"],
+button.primary {
+  color: #1a1405;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.button-row,
+.speeds,
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+fieldset {
+  margin: 10px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+legend {
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.bet-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.bet-form label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+input {
+  width: 96px;
+  font: inherit;
+  color: var(--text);
+  background: #0f121a;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 8px;
+}
+
+.round-card {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #0f121a;
+  border-left: 4px solid var(--muted);
+}
+
+.round-card.win {
+  border-left-color: var(--win);
+}
+
+.round-card.loss {
+  border-left-color: var(--loss);
+}
+
+.round-card.pending {
+  border-left-color: var(--accent);
+}
+
+.round-card ul {
+  margin: 6px 0;
+  padding-left: 18px;
+  color: var(--muted);
+}
+
+.headline {
+  font-weight: 600;
+}
+
+.item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item-list li {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.item-note {
+  color: var(--win);
+}
+
+.notices {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transform: translateX(-50%);
+}
+
+.notice {
+  padding: 8px 14px;
+  background: rgb(60 20 28 / 0.92);
+  border: 1px solid var(--loss);
+  border-radius: 8px;
+}
+
+@media (max-width: 800px) {
+  body {
+    overflow: auto;
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: 60vh auto;
+    height: auto;
+  }
+}
