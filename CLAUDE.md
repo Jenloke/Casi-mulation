@@ -1,0 +1,73 @@
+# CLAUDE.md
+
+Browser "RPG casino": pnpm + Turborepo monorepo. Read `docs/architecture.md` for the full
+picture and `docs/decisions.md` before changing a behavior that looks deliberate.
+
+## Commands
+
+```sh
+pnpm install          # also downloads Node 26 (devEngines.runtime); use pnpm, never npm
+pnpm dev              # server :3001, game :5173, dashboard :5174
+pnpm build            # tsc (TypeScript 7) everywhere + vite builds; libs only type-check
+pnpm lint             # biome check .   (pnpm format applies fixes)
+pnpm test             # vitest in every package
+pnpm e2e              # Playwright smoke test; starts all three apps itself
+pnpm --filter @casino/core test monteCarlo   # one package / one file
+```
+
+Every change should leave `pnpm build`, `pnpm lint`, `pnpm test` and `pnpm e2e` green.
+
+## Layout and dependency rules
+
+- `packages/contracts`: wire types only. It depends on nothing.
+- `packages/core`: **all game logic**, as plain TS classes. No DOM, Node or framework
+  imports, no global random source, no wall-clock time. Enforced by Biome
+  (`noNodejsModules`) and `packages/core/test/architecture.test.ts`. Inject `Rng` and
+  `Clock`.
+- `apps/server`: the only consumer of core. It composes the world (`CasinoServer.ts`),
+  runs the loop and serves analytics.
+- `apps/game`, `apps/dashboard`: render and send commands. **No game logic.** Phaser and
+  React talk only through the typed `GameBus` (`apps/game/src/bus`).
+
+## Conventions
+
+- Small, single-purpose classes; a facade (`CasinoWorld`) delegates to services.
+- **Erasable TypeScript only.** Node runs the server's TS directly, so: no enums,
+  namespaces or constructor parameter properties; `import type` for types; relative
+  imports end in `.ts`/`.tsx`.
+- Strict TS 7 plus `noUncheckedIndexedAccess`: handle `undefined` from index access
+  instead of using `!` (Biome forbids non-null assertions).
+- Biome formats: single quotes, 2-space indent, 100 columns. Run `pnpm format` rather than
+  hand-formatting.
+- Commands are the only way to change the world, for humans and for `BotBrain` alike. New
+  behavior = a new `PlayerCommand` in contracts, validation in
+  `apps/server/src/net/messageCodec.ts`, a route in `CommandHandler`, and a service method.
+- Anything touching chips or items records a domain event through `EventRecorder`. The
+  server's `AnalyticsAggregator` folds events; it never reads world state for totals.
+- Repositories (`PlayerRepository`, `DomainEventStore`) are interfaces with in-memory
+  implementations. Keep it that way so a database adapter can drop in.
+- Character look and name live in `CharacterProfile`; extend it, don't put look fields on
+  `Player`.
+
+## Extending
+
+- **Game:** one class implementing `CasinoGame` + one line in
+  `games/defaultGames.ts` + a glyph/table in `floor/casinoFloor.ts`. See
+  `docs/adding-a-game.md`. The Monte Carlo suite picks it up automatically.
+- **Item:** one entry in `items/itemDefinitions.ts` (boost ≤ `MAX_ODDS_BOOST`).
+- **Bot personality:** one entry in `ai/personalities.ts`.
+
+## Testing notes
+
+- Use `SeededRng` and `ManualClock` for deterministic tests. `runUntil(world, condition)`
+  in `world.test.ts` drives ticks.
+- Monte Carlo tests compare against `theoreticalRtp` within 4 standard errors. If you
+  change a paytable, fix the theoretical value instead of loosening the tolerance.
+- The e2e test relies on `data-testid`s in the HUD (`chip-count`, `player-pos`,
+  `table-panel`, `shop-panel`, `inventory-panel`, `round-result`, ...) and the dashboard
+  (`total-rounds`, `humans-online`, `leaderboard`). Keep them stable.
+
+## Decisions
+
+Log non-obvious calls in `docs/decisions.md` (what and why), and commit after each
+milestone.
