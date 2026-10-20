@@ -151,6 +151,11 @@ button.primary {
   border-color: var(--accent);
 }
 
+button[aria-pressed="true"]:hover:not(:disabled),
+button.primary:hover:not(:disabled) {
+  background: #f0c869;
+}
+
 .button-row,
 .speeds,
 .options {
