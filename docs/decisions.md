@@ -78,3 +78,65 @@ decided and why, so it can be revisited deliberately.
 - **Repositories are interfaces** (`PlayerRepository`, `DomainEventStore`) with in-memory
   implementations. The event store keeps a bounded window in memory so a long session can't
   exhaust it; aggregates are kept incrementally and never need a replay.
+
+## Server
+
+- **Node runs the server's TypeScript directly** (`node src/main.ts`, `node --watch` in dev),
+  so the server's `build` is a type-check and there is nothing to deploy but source.
+- **Fixed 100 ms beat.** Each beat advances the world 1, 2 or 4 ticks (the shared speed),
+  then sends every client the public snapshot (serialized once) plus its private state.
+  Ten messages a second is plenty for a tile game; the client tweens between tiles.
+- **One guest per WebSocket, no auth.** A reconnect is a new guest. Commands from the wire
+  are validated field by field before they reach core; malformed ones are dropped.
+- **RTP = paid ÷ wagered.** Wagers are counted at `BetPlaced`, payouts at `PayoutSettled`,
+  so a blackjack hand that is still open counts as wagered but not yet paid; the
+  difference is a handful of chips at most.
+- **Timeline buckets are 10 s wide, last 10 minutes,** on wall-clock time, so running at 4x
+  visibly increases rounds per bucket.
+- **The leaderboard is who is on the floor now** (current chips). Bots that walked out
+  leave the board.
+- **Fastify listens on `localhost`,** which binds both IPv4 and IPv6 loopback, so the Vite
+  proxies work whichever one `localhost` resolves to.
+
+## Game client
+
+- **Thin client.** The game app depends only on `@casino/contracts`; the floor, games and
+  items arrive in the welcome message. No rules run in the browser.
+- **The event bus remembers the latest payload per event** and can replay it to a new
+  subscriber, because the Phaser scene finishes booting after the first state arrives.
+  The scene unsubscribes on both shutdown and destroy (React StrictMode creates the game
+  twice in development).
+- **Clicks become `moveTo`**, and the server works out the intent: table → free seat,
+  counter → shop tile. The "Walk to" buttons send the same command, so they are a
+  shortcut, not a second code path.
+- **Arrow keys are polled, not captured,** so they still work in the HUD's number inputs.
+  Steps repeat every 160 ms while a key is held.
+- **Camera zoom is fixed at 1.5x and follows your character,** clamped to the floor, which
+  centers it when the window is larger than the zoomed floor.
+
+## Dashboard
+
+- **Polling, not push.** `/api/analytics` is polled every second: simplest thing that is
+  live enough, and the server's snapshot is cheap (aggregates are precomputed).
+- **Colors follow the reference data-viz palette.** Each game owns the categorical slot of
+  its registry position on every chart, so a color always means the same game. The three
+  game colors pass the palette validator all-pairs in light and dark. Light-mode aqua sits
+  at 2.74:1 against the surface, which the visible row labels and table views relieve.
+  Guests vs bots uses the emphasis form (guests violet, bots gray).
+- **Every chart has a table view** and a legend; tooltips add detail but never hold the
+  only copy of a value.
+- **Hand-drawn SVG instead of a chart library:** six small charts didn't justify a
+  dependency, and it keeps the mark specs (thin bars, rounded data ends, hairline grids)
+  exact.
+
+## Testing
+
+- **The Monte Carlo suite is data-driven over the game registry,** so every game, current
+  or future, gets an RTP test per bet option, with and without each of its item boosts.
+  The tolerance is 4 standard errors of the simulated estimate, not a magic number.
+- **One Playwright smoke test** starts the server (6 bots, seed 7), the game and the
+  dashboard. It walks, buys an item, plays all three games, turns on auto-play at 4x and
+  checks the dashboard updates. It also fails on any uncaught page error.
+- **npm is not supported inside the repository:** npm enforces `devEngines.runtime`
+  strictly and refuses to run on a non-26 Node. pnpm reads the same field and downloads
+  Node 26 instead.
