@@ -1,3 +1,5 @@
+import { Button } from '@casino/ui/components/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@casino/ui/components/card';
 import { firstTileOfKind, roomiestTable } from './floorQueries.ts';
 import { useClientState, useSendCommand } from './GameContext.tsx';
 
@@ -8,18 +10,27 @@ export function Destinations() {
   if (!welcome || !state || state.self.autoPlay) return null;
   const counter = firstTileOfKind(welcome.floor, 'counter');
   return (
-    <section className="panel">
-      <h2>Walk to</h2>
-      <div className="button-row">
+    <Card size="sm">
+      <CardHeader>
+        <CardTitle>
+          <h2>Walk to</h2>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-wrap gap-1.5">
         {counter && (
-          <button type="button" onClick={() => send({ type: 'moveTo', target: counter })}>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => send({ type: 'moveTo', target: counter })}
+          >
             Shop
-          </button>
+          </Button>
         )}
         {welcome.games.map((game) => (
-          <button
+          <Button
             key={game.id}
-            type="button"
+            variant="secondary"
+            size="sm"
             onClick={() => {
               const table = roomiestTable(welcome.floor, game.id, state.world.players);
               const target = table?.tiles[0];
@@ -27,9 +38,9 @@ export function Destinations() {
             }}
           >
             {game.name}
-          </button>
+          </Button>
         ))}
-      </div>
-    </section>
+      </CardContent>
+    </Card>
   );
 }
