@@ -19,6 +19,11 @@
       "quoteStyle": "single"
     }
   },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
   "linter": {
     "enabled": true,
     "rules": {
@@ -44,6 +49,34 @@
         "rules": {
           "correctness": {
             "noNodejsModules": "error"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "packages/ui/src/components/**",
+        "packages/ui/src/hooks/**",
+        "packages/ui/src/lib/**"
+      ],
+      "formatter": {
+        "enabled": false
+      },
+      "assist": {
+        "enabled": false
+      },
+      "linter": {
+        "rules": {
+          "a11y": {
+            "noLabelWithoutControl": "off",
+            "useSemanticElements": "off"
+          },
+          "style": {
+            "useImportType": "off"
+          },
+          "suspicious": {
+            "noArrayIndexKey": "off",
+            "noDoubleEquals": "off"
           }
         }
       }
