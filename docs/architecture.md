@@ -14,16 +14,18 @@
  ┌──────────────────────────────────┐  HTTP  │   │                          │              │
  │ useAnalytics (1 s poll) ─▶ charts│◀──────▶│ GET /api/analytics ◀─ AnalyticsService     │
  └──────────────────────────────────┘        └────────────────────────────────────────────┘
-        both import types from packages/contracts; only the server imports packages/core
+        both import types from packages/contracts; only the server imports packages/core;
+        both browser apps style themselves with packages/ui
 ```
 
 | Package | Depends on | Responsibility |
 | --- | --- | --- |
 | `@casino/contracts` | nothing | Wire types: `PlayerCommand`, `ServerMessage`, floor/player/round DTOs, analytics DTOs |
 | `@casino/core` | contracts | The whole game: floor, pathfinding, games, items, players, AI, domain events |
+| `@casino/ui` | nothing | Design system: shadcn/ui components, the theme (light and dark), `ThemeProvider` |
 | `@casino/server` | core, contracts | Real-time loop, WebSocket sessions, event store, analytics API |
-| `@casino/game` | contracts | Renders state and sends commands; no rules |
-| `@casino/dashboard` | contracts | Renders analytics |
+| `@casino/game` | contracts, ui | Renders state and sends commands; no rules |
+| `@casino/dashboard` | contracts, ui | Renders analytics |
 
 Workspace packages export their TypeScript source. Vite, Vitest and Node 26 (native type
 stripping) all run it directly, so libraries have no build output.
@@ -103,15 +105,25 @@ server's `GameLoop` calls `advance()` 1, 2 or 4 times per 100 ms of real time, d
   (clicks → `moveTo`, arrow keys → `step`).
 - `state/ClientStateStore.ts` + `ui/`: React reads bus state through
   `useSyncExternalStore` and sends commands with `useSendCommand()`. The bet form and round
-  card are generic, built from each game's `betOptions` and text `RoundView`.
+  card are generic, built from each game's `betOptions` and text `RoundView`. The HUD is
+  `@casino/ui` cards, buttons, fields and items over the canvas, always in the dark theme.
 
 ## Dashboard (`apps/dashboard/src`)
 
 `useAnalytics` polls `/api/analytics` every second and keeps the last good snapshot when
 the server is unreachable. Charts are hand-drawn SVG: thin bars, dumbbells, a multi-line
-timeline with a crosshair. Each sits in a `ChartCard` with a legend and a table view.
-Colors follow the reference data-viz palette. Each game keeps the categorical slot of its
-registry position on every chart.
+timeline with a crosshair. Each sits in a `ChartCard` (a card with Chart / Table tabs) with a
+legend and a table view. Colors follow the reference data-viz palette through the theme's
+`chart-*` tokens. Each game keeps the categorical slot of its registry position on every
+chart. The page follows the OS theme; `ModeToggle` overrides it.
+
+## UI (`packages/ui`)
+
+shadcn/ui components on Base UI primitives (Nova style) and Tailwind CSS v4, shared by both
+browser apps. `src/components`, `src/lib` and `src/hooks` are written by the shadcn CLI
+(`pnpm ui:add <name>`); `src/styles/globals.css` holds the theme tokens and `src/theme` the
+light/dark/system provider. Apps import `@casino/ui/globals.css` once and write no CSS of their
+own. Details, token meanings and the steps for a new app: [ui.md](ui.md).
 
 ## Seams for later
 

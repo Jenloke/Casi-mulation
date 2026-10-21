@@ -140,3 +140,58 @@ decided and why, so it can be revisited deliberately.
 - **npm is not supported inside the repository:** npm enforces `devEngines.runtime`
   strictly and refuses to run on a non-26 Node. pnpm reads the same field and downloads
   Node 26 instead.
+
+## Design system
+
+- **One design system package, `@casino/ui`.** shadcn/ui lives in `packages/ui` and every web
+  app, current or future, styles itself with it. It follows shadcn's own monorepo layout (a
+  `components.json` in every workspace, components installed into the shared package) so the
+  CLI keeps working. How to use it: [ui.md](ui.md).
+- **Base UI primitives, Nova style, Geist, lucide icons.** These are the shadcn CLI defaults.
+  Base UI is its recommended library, and Nova's tighter spacing suits a HUD sidebar and a
+  data-dense dashboard alike.
+- **Apps write no CSS.** Each app imports `@casino/ui/globals.css` and styles with Tailwind
+  utilities on semantic tokens; both `styles.css` files are gone. Chart chrome has tokens too
+  (`chart-grid`, `chart-axis`, `chart-muted`, `chart-deemphasis`), so SVG marks use utilities.
+- **The theme is the reference data-viz palette plus casino gold.** The neutral tokens are the
+  reference chrome values (page `#f9f9f7` / `#0d0d0d`, surface `#fcfcfb` / `#1a1a19`, the inks,
+  grid and axis), so the dashboard's series colors still render on the surfaces they were
+  validated against. Re-run after the move: the three game colors pass all-pairs in both modes;
+  light aqua stays at 2.74:1, relieved by the row labels and table views. `chart-1` to `chart-8`
+  are the eight categorical slots.
+- **Gold is chosen per mode.** Dark mode keeps the game's accent `#e6b84a` with dark text
+  (9.9:1). Light mode uses `#8a6514` with near-white text, which passes 5.2:1 both as a fill and
+  as text; bright gold as text on the light surface would be 1.8:1.
+- **Dark `destructive` is `#e5534b`, not the reference critical `#d03b3b`.** shadcn uses
+  `destructive` as text (alerts, error badges) and `#d03b3b` is 3.6:1 on the dark card, where
+  `#e5534b` is 4.7:1. Light mode keeps `#d03b3b` (4.7:1). A `success` token (`#006300` /
+  `#0ca30c`, the reference success-text steps) marks wins.
+- **The game HUD is always dark; the dashboard follows the OS.** The game sets `class="dark"` on
+  `<html>`. The dashboard uses `ThemeProvider` and `ModeToggle` (light / dark / system, kept in
+  `localStorage` as `casino-theme`) plus an inline script in `index.html` that sets the class
+  before the first paint, so dark-mode users see no light flash. The Phaser canvas background is
+  the dark `--background` (`#0d0d0d`), so the floor's edge meets the HUD.
+- **No arrow-key focus groups in the game HUD.** Base UI's ToggleGroup, RadioGroup and Tabs move
+  focus with the arrow keys and cancel the event; Phaser ignores cancelled key events, so the
+  character would stop walking whenever one had focus. Speed and bet choices stay `aria-pressed`
+  buttons, which also keeps the e2e selectors. The dashboard has no keyboard conflict and uses
+  `Tabs` for chart and table views. Start/stop auto-play lost `aria-pressed`: its label already
+  changes with the state.
+- **Rejected-command notices are `Alert`s** (`role="alert"`), announced once and at once; the
+  container's `aria-live` would have announced them twice.
+- **Vendored shadcn files stay as the CLI writes them.** Biome lints
+  `packages/ui/src/{components,hooks,lib}` but doesn't format them or sort their imports, and
+  turns off the five rules upstream code trips (`useSemanticElements`, `noLabelWithoutControl`,
+  `useImportType`, `noArrayIndexKey`, `noDoubleEquals`). That keeps `shadcn add --diff` and
+  `--overwrite` free of formatting noise. Repo-authored UI code (`src/theme`, the apps) is fully
+  linted and formatted, and Biome parses Tailwind directives (`css.parser.tailwindDirectives`).
+- **`shadcn` is a dependency of `packages/ui`.** `globals.css` imports `shadcn/tailwind.css` (the
+  data-attribute variants and animations Base UI components need), and the package pins the CLI
+  that `pnpm ui:add` runs. Only that CSS reaches the browser.
+- **`saveExact: true` in `pnpm-workspace.yaml`.** The shadcn CLI installs dependencies with
+  `pnpm add`; this pins them to exact versions like everything else in the repo.
+- **Workarounds for shadcn CLI 4.22 on Windows.** With a dot anywhere in the path, the CLI cuts
+  resolved alias directories at that dot, and its workspace lookup compares `\` against `/`.
+  `packages/ui` therefore exports `./components`, `./hooks` and `./lib` as directories (an exact
+  match skips the bad code path; nothing imports them), and `pnpm ui:add` runs the CLI inside
+  `packages/ui`. Drop both once shadcn fixes the bugs.

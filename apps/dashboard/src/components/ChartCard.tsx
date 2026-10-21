@@ -1,4 +1,21 @@
-import { type ReactNode, useState } from 'react';
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@casino/ui/components/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@casino/ui/components/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@casino/ui/components/tabs';
+import type { ReactNode } from 'react';
 
 export interface TableView {
   readonly columns: readonly string[];
@@ -16,51 +33,59 @@ interface ChartCardProps {
 }
 
 export function ChartCard({ title, subtitle, table, legend, wide, children }: ChartCardProps) {
-  const [showTable, setShowTable] = useState(false);
   return (
-    <figure className={wide ? 'card wide' : 'card'}>
-      <figcaption className="card-header">
-        <div>
-          <h2>{title}</h2>
-          <p className="subtitle">{subtitle}</p>
-        </div>
-        <button
-          type="button"
-          className="ghost"
-          aria-pressed={showTable}
-          onClick={() => setShowTable((shown) => !shown)}
-        >
-          {showTable ? 'Chart view' : 'Table view'}
-        </button>
-      </figcaption>
-      {!showTable && legend}
-      {showTable ? <DataTable table={table} /> : children}
-    </figure>
+    <Card className={wide ? 'col-span-full' : undefined}>
+      <Tabs defaultValue="chart" className="contents">
+        <CardHeader>
+          <CardTitle>
+            <h2>{title}</h2>
+          </CardTitle>
+          <CardDescription>{subtitle}</CardDescription>
+          <CardAction>
+            <TabsList>
+              <TabsTrigger value="chart">Chart</TabsTrigger>
+              <TabsTrigger value="table">Table</TabsTrigger>
+            </TabsList>
+          </CardAction>
+        </CardHeader>
+        <CardContent>
+          <TabsContent value="chart">
+            {legend}
+            {children}
+          </TabsContent>
+          <TabsContent value="table">
+            <DataTable table={table} />
+          </TabsContent>
+        </CardContent>
+      </Tabs>
+    </Card>
   );
 }
 
 export function DataTable(props: { table: TableView; testId?: string }) {
   const { columns, rows } = props.table;
   return (
-    <table className="data-table" data-testid={props.testId}>
-      <thead>
-        <tr>
+    <Table data-testid={props.testId}>
+      <TableHeader>
+        <TableRow>
           {columns.map((column) => (
-            <th key={column} scope="col">
+            <TableHead key={column} scope="col" className="text-muted-foreground">
               {column}
-            </th>
+            </TableHead>
           ))}
-        </tr>
-      </thead>
-      <tbody>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
         {rows.map((row) => (
-          <tr key={row.join('|')}>
+          <TableRow key={row.join('|')}>
             {columns.map((column, index) => (
-              <td key={column}>{row[index]}</td>
+              <TableCell key={column} className="tabular-nums">
+                {row[index]}
+              </TableCell>
             ))}
-          </tr>
+          </TableRow>
         ))}
-      </tbody>
-    </table>
+      </TableBody>
+    </Table>
   );
 }

@@ -61,17 +61,23 @@ export function RoundsTimeline({ timeline, series }: Props) {
         <Legend items={series.map((s) => ({ label: s.name, color: s.color, swatch: 'line' }))} />
       }
     >
-      <div ref={ref} className="chart">
+      <div ref={ref} className="relative w-full">
         {width > 0 && (
-          <svg width={width} height={HEIGHT}>
+          <svg className="block overflow-visible" width={width} height={HEIGHT}>
             <title>Rounds settled over time, by game</title>
             {yTicks.map((tick) => (
               <g key={tick}>
-                <line x1={MARGIN.left} x2={plotRight} y1={y(tick)} y2={y(tick)} className="grid" />
+                <line
+                  x1={MARGIN.left}
+                  x2={plotRight}
+                  y1={y(tick)}
+                  y2={y(tick)}
+                  className="stroke-chart-grid"
+                />
                 <text
                   x={MARGIN.left - 8}
                   y={y(tick)}
-                  className="tick"
+                  className="fill-chart-muted text-[11px] tabular-nums"
                   textAnchor="end"
                   dominantBaseline="middle"
                 >
@@ -80,7 +86,13 @@ export function RoundsTimeline({ timeline, series }: Props) {
               </g>
             ))}
             {[0, Math.round(last / 2), last].map((index) => (
-              <text key={index} x={x(index)} y={HEIGHT - 8} className="tick" textAnchor="middle">
+              <text
+                key={index}
+                x={x(index)}
+                y={HEIGHT - 8}
+                className="fill-chart-muted text-[11px] tabular-nums"
+                textAnchor="middle"
+              >
                 {index === last ? 'now' : `-${Math.round(((last - index) * bucketMs) / 60_000)}m`}
               </text>
             ))}
@@ -104,7 +116,7 @@ export function RoundsTimeline({ timeline, series }: Props) {
                 cy={y(valueAt(last, s.id))}
                 r={4}
                 fill={s.color}
-                className="ringed"
+                className="stroke-card stroke-2"
               />
             ))}
             {endLabels.map((label) => (
@@ -112,7 +124,7 @@ export function RoundsTimeline({ timeline, series }: Props) {
                 key={label.id}
                 x={plotRight + 10}
                 y={label.y}
-                className="value-label"
+                className="fill-muted-foreground text-[11px]"
                 dominantBaseline="middle"
               >
                 {label.name}
@@ -125,7 +137,7 @@ export function RoundsTimeline({ timeline, series }: Props) {
                   x2={x(hoverIndex)}
                   y1={MARGIN.top}
                   y2={HEIGHT - MARGIN.bottom}
-                  className="crosshair"
+                  className="stroke-chart-muted"
                 />
                 {series.map((s) => (
                   <circle
@@ -134,7 +146,7 @@ export function RoundsTimeline({ timeline, series }: Props) {
                     cy={y(valueAt(hoverIndex, s.id))}
                     r={4}
                     fill={s.color}
-                    className="ringed"
+                    className="stroke-card stroke-2"
                   />
                 ))}
               </g>

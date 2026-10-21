@@ -1,4 +1,11 @@
 import type { AnalyticsSnapshotDto } from '@casino/contracts';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@casino/ui/components/card';
 import { formatCompact, formatCount, formatPercent } from '../format.ts';
 
 interface StatTileProps {
@@ -10,13 +17,15 @@ interface StatTileProps {
 
 function StatTile({ label, value, detail, testId }: StatTileProps) {
   return (
-    <div className="stat-tile">
-      <p className="stat-label">{label}</p>
-      <p className="stat-value" data-testid={testId}>
-        {value}
-      </p>
-      <p className="stat-detail">{detail}</p>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardDescription>{label}</CardDescription>
+        <CardTitle className="text-3xl font-semibold" data-testid={testId}>
+          {value}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="text-xs text-muted-foreground">{detail}</CardContent>
+    </Card>
   );
 }
 
@@ -24,7 +33,10 @@ export function KpiRow({ snapshot }: { snapshot: AnalyticsSnapshotDto }) {
   const { totals, population } = snapshot;
   const houseKept = totals.wagered - totals.paid;
   return (
-    <section className="kpi-row" aria-label="Headline numbers">
+    <section
+      className="mb-4 grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-3"
+      aria-label="Headline numbers"
+    >
       <StatTile
         label="Rounds played"
         value={formatCount(totals.rounds)}

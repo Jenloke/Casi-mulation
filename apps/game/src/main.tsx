@@ -5,7 +5,7 @@ import { createGameBus } from './bus/gameBus.ts';
 import { ServerConnection } from './net/ServerConnection.ts';
 import { ClientStateStore } from './state/ClientStateStore.ts';
 import { App } from './ui/App.tsx';
-import './styles.css';
+import '@casino/ui/globals.css';
 
 const bus = createGameBus();
 const store = new ClientStateStore(bus);

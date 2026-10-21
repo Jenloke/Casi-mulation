@@ -16,7 +16,8 @@
     "test": "turbo run test",
     "lint": "biome check .",
     "format": "biome check --write .",
-    "e2e": "pnpm --filter @casino/e2e test:e2e"
+    "e2e": "pnpm --filter @casino/e2e test:e2e",
+    "ui:add": "pnpm --filter @casino/ui exec shadcn add"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",

@@ -45,8 +45,8 @@ export function ItemEffectChart({ effects, series }: Props) {
   const legend = (
     <Legend
       items={[
-        { label: 'Without item', color: 'var(--text-secondary)', swatch: 'ring' },
-        { label: 'With item', color: 'var(--text-secondary)', swatch: 'dot' },
+        { label: 'Without item', color: 'var(--muted-foreground)', swatch: 'ring' },
+        { label: 'With item', color: 'var(--muted-foreground)', swatch: 'dot' },
       ]}
     />
   );
@@ -58,12 +58,18 @@ export function ItemEffectChart({ effects, series }: Props) {
       table={table}
       legend={legend}
     >
-      <div ref={ref} className="chart" onPointerLeave={hover.hide}>
+      <div ref={ref} className="relative w-full" onPointerLeave={hover.hide}>
         {width > 0 && (
-          <svg width={width} height={rowsHeight + AXIS}>
+          <svg className="block overflow-visible" width={width} height={rowsHeight + AXIS}>
             <title>Win rate with and without items per game</title>
             {[0, hi / 2, hi].map((tick) => (
-              <text key={tick} x={x(tick)} y={rowsHeight + 16} className="tick" textAnchor="middle">
+              <text
+                key={tick}
+                x={x(tick)}
+                y={rowsHeight + 16}
+                className="fill-chart-muted text-[11px] tabular-nums"
+                textAnchor="middle"
+              >
                 {formatPercent(tick, 0)}
               </text>
             ))}
@@ -93,10 +99,15 @@ export function ItemEffectChart({ effects, series }: Props) {
                   }
                 >
                   <rect x={0} y={y - ROW / 2} width={width} height={ROW} fill="transparent" />
-                  <text x={0} y={y} className="row-label" dominantBaseline="middle">
+                  <text
+                    x={0}
+                    y={y}
+                    className="fill-muted-foreground text-xs"
+                    dominantBaseline="middle"
+                  >
                     {name}
                   </text>
-                  <line x1={x(0)} x2={plotRight} y1={y} y2={y} className="grid" />
+                  <line x1={x(0)} x2={plotRight} y1={y} y2={y} className="stroke-chart-grid" />
                   {without !== null && withItem !== null && (
                     <line
                       x1={x(without)}
@@ -107,11 +118,29 @@ export function ItemEffectChart({ effects, series }: Props) {
                       strokeWidth={2}
                     />
                   )}
-                  {without !== null && <circle cx={x(without)} cy={y} r={5} className="hollow" />}
-                  {withItem !== null && (
-                    <circle cx={x(withItem)} cy={y} r={5} fill={color} className="ringed" />
+                  {without !== null && (
+                    <circle
+                      cx={x(without)}
+                      cy={y}
+                      r={5}
+                      className="fill-card stroke-muted-foreground stroke-2"
+                    />
                   )}
-                  <text x={plotRight + 12} y={y} className="value-label" dominantBaseline="middle">
+                  {withItem !== null && (
+                    <circle
+                      cx={x(withItem)}
+                      cy={y}
+                      r={5}
+                      fill={color}
+                      className="stroke-card stroke-2"
+                    />
+                  )}
+                  <text
+                    x={plotRight + 12}
+                    y={y}
+                    className="fill-muted-foreground text-[11px]"
+                    dominantBaseline="middle"
+                  >
                     {lift === null
                       ? 'no item rounds yet'
                       : `${lift >= 0 ? '+' : ''}${lift.toFixed(1)} pts with item`}
