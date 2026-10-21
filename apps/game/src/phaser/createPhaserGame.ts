@@ -6,7 +6,8 @@ export function createPhaserGame(parent: HTMLElement, bus: GameBus): Phaser.Game
   return new Phaser.Game({
     type: Phaser.AUTO,
     parent,
-    backgroundColor: '#0b0d12',
+    // The dark theme's --background (packages/ui), so the canvas edge meets the HUD.
+    backgroundColor: '#0d0d0d',
     scale: {
       mode: Phaser.Scale.RESIZE,
       width: parent.clientWidth,
