@@ -39,8 +39,8 @@ export function WageredPaidChart({ games, series }: Props) {
   const legend = (
     <Legend
       items={[
-        { label: 'Wagered', color: 'var(--text-secondary)', swatch: 'tint' },
-        { label: 'Paid out', color: 'var(--text-secondary)', swatch: 'rect' },
+        { label: 'Wagered', color: 'var(--muted-foreground)', swatch: 'tint' },
+        { label: 'Paid out', color: 'var(--muted-foreground)', swatch: 'rect' },
       ]}
     />
   );
@@ -52,9 +52,9 @@ export function WageredPaidChart({ games, series }: Props) {
       table={table}
       legend={legend}
     >
-      <div ref={ref} className="chart" onPointerLeave={hover.hide}>
+      <div ref={ref} className="relative w-full" onPointerLeave={hover.hide}>
         {width > 0 && (
-          <svg width={width} height={height}>
+          <svg className="block overflow-visible" width={width} height={height}>
             <title>Chips wagered and paid out per game</title>
             {games.map((game, index) => {
               const top = GROUP_GAP / 2 + index * (groupHeight + GROUP_GAP);
@@ -68,7 +68,7 @@ export function WageredPaidChart({ games, series }: Props) {
                   <text
                     x={0}
                     y={top + groupHeight / 2}
-                    className="row-label"
+                    className="fill-muted-foreground text-xs"
                     dominantBaseline="middle"
                   >
                     {game.name}
@@ -97,7 +97,7 @@ export function WageredPaidChart({ games, series }: Props) {
                       <text
                         x={x(bar.value) + 6}
                         y={bar.y + BAR / 2}
-                        className="value-label"
+                        className="fill-muted-foreground text-[11px]"
                         dominantBaseline="middle"
                       >
                         {formatCompact(bar.value)}
@@ -107,7 +107,7 @@ export function WageredPaidChart({ games, series }: Props) {
                 </g>
               );
             })}
-            <line x1={x(0)} x2={x(0)} y1={0} y2={height} className="baseline" />
+            <line x1={x(0)} x2={x(0)} y1={0} y2={height} className="stroke-chart-axis" />
           </svg>
         )}
         <Tooltip content={hover.tip} chartWidth={width} />

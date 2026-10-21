@@ -48,8 +48,8 @@ export function RtpChart({ games, series }: Props) {
   const legend = (
     <Legend
       items={[
-        { label: 'Actual', color: 'var(--text-secondary)', swatch: 'dot' },
-        { label: 'Theoretical', color: 'var(--text-primary)', swatch: 'tick' },
+        { label: 'Actual', color: 'var(--muted-foreground)', swatch: 'dot' },
+        { label: 'Theoretical', color: 'var(--foreground)', swatch: 'tick' },
       ]}
     />
   );
@@ -61,13 +61,19 @@ export function RtpChart({ games, series }: Props) {
       table={table}
       legend={legend}
     >
-      <div ref={ref} className="chart" onPointerLeave={hover.hide}>
+      <div ref={ref} className="relative w-full" onPointerLeave={hover.hide}>
         {width > 0 && (
-          <svg width={width} height={rowsHeight + AXIS}>
+          <svg className="block overflow-visible" width={width} height={rowsHeight + AXIS}>
             <title>Actual versus theoretical return to player per game</title>
-            <line x1={x(1)} x2={x(1)} y1={0} y2={rowsHeight} className="baseline" />
+            <line x1={x(1)} x2={x(1)} y1={0} y2={rowsHeight} className="stroke-chart-axis" />
             {ticks.map((tick) => (
-              <text key={tick} x={x(tick)} y={rowsHeight + 16} className="tick" textAnchor="middle">
+              <text
+                key={tick}
+                x={x(tick)}
+                y={rowsHeight + 16}
+                className="fill-chart-muted text-[11px] tabular-nums"
+                textAnchor="middle"
+              >
                 {formatPercent(tick, 0)}
               </text>
             ))}
@@ -87,10 +93,15 @@ export function RtpChart({ games, series }: Props) {
                   }
                 >
                   <rect x={0} y={y - ROW / 2} width={width} height={ROW} fill="transparent" />
-                  <text x={0} y={y} className="row-label" dominantBaseline="middle">
+                  <text
+                    x={0}
+                    y={y}
+                    className="fill-muted-foreground text-xs"
+                    dominantBaseline="middle"
+                  >
                     {game.name}
                   </text>
-                  <line x1={x(lo)} x2={plotRight} y1={y} y2={y} className="grid" />
+                  <line x1={x(lo)} x2={plotRight} y1={y} y2={y} className="stroke-chart-grid" />
                   {actual !== null && (
                     <line
                       x1={x(game.theoreticalRtp)}
@@ -106,12 +117,23 @@ export function RtpChart({ games, series }: Props) {
                     x2={x(game.theoreticalRtp)}
                     y1={y - 7}
                     y2={y + 7}
-                    className="theory-tick"
+                    className="stroke-foreground stroke-2"
                   />
                   {actual !== null && (
-                    <circle cx={x(actual)} cy={y} r={5} fill={color} className="ringed" />
+                    <circle
+                      cx={x(actual)}
+                      cy={y}
+                      r={5}
+                      fill={color}
+                      className="stroke-card stroke-2"
+                    />
                   )}
-                  <text x={plotRight + 12} y={y} className="value-label" dominantBaseline="middle">
+                  <text
+                    x={plotRight + 12}
+                    y={y}
+                    className="fill-muted-foreground text-[11px]"
+                    dominantBaseline="middle"
+                  >
                     {actual === null ? 'no rounds yet' : `${formatPercent(actual)} actual`}
                   </text>
                 </g>

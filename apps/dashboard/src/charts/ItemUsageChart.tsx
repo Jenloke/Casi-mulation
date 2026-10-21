@@ -41,9 +41,9 @@ export function ItemUsageChart({ usage, series }: Props) {
       table={table}
       legend={<Legend items={gamesWithItems.map((s) => ({ label: s.name, color: s.color }))} />}
     >
-      <div ref={ref} className="chart" onPointerLeave={hover.hide}>
+      <div ref={ref} className="relative w-full" onPointerLeave={hover.hide}>
         {width > 0 && (
-          <svg width={width} height={usage.length * ROW}>
+          <svg className="block overflow-visible" width={width} height={usage.length * ROW}>
             <title>Uses per shop item</title>
             {usage.map((item, index) => {
               const y = index * ROW + (ROW - BAR) / 2;
@@ -59,14 +59,19 @@ export function ItemUsageChart({ usage, series }: Props) {
                   }
                 >
                   <rect x={0} y={index * ROW} width={width} height={ROW} fill="transparent" />
-                  <text x={0} y={y + BAR / 2} className="row-label" dominantBaseline="middle">
+                  <text
+                    x={0}
+                    y={y + BAR / 2}
+                    className="fill-muted-foreground text-xs"
+                    dominantBaseline="middle"
+                  >
                     {item.name}
                   </text>
                   <path d={hBarPath(x(0), y, x(item.uses) - x(0), BAR)} fill={color} />
                   <text
                     x={x(item.uses) + 6}
                     y={y + BAR / 2}
-                    className="value-label"
+                    className="fill-muted-foreground text-[11px]"
                     dominantBaseline="middle"
                   >
                     {`${formatCount(item.uses)} uses · ${formatCount(item.purchases)} bought`}
@@ -74,7 +79,13 @@ export function ItemUsageChart({ usage, series }: Props) {
                 </g>
               );
             })}
-            <line x1={x(0)} x2={x(0)} y1={0} y2={usage.length * ROW} className="baseline" />
+            <line
+              x1={x(0)}
+              x2={x(0)}
+              y1={0}
+              y2={usage.length * ROW}
+              className="stroke-chart-axis"
+            />
           </svg>
         )}
         <Tooltip content={hover.tip} chartWidth={width} />

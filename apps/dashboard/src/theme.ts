@@ -17,12 +17,12 @@ export function gameSeries(games: readonly GameStatsDto[]): GameSeries[] {
   return games.map((game, index) => ({
     id: game.gameId,
     name: game.name,
-    color: index < CATEGORICAL_SLOTS ? `var(--series-${index + 1})` : 'var(--deemphasis)',
+    color: index < CATEGORICAL_SLOTS ? `var(--chart-${index + 1})` : 'var(--chart-deemphasis)',
   }));
 }
 
 export function colorOf(series: readonly GameSeries[], gameId: GameId): string {
-  return series.find((entry) => entry.id === gameId)?.color ?? 'var(--deemphasis)';
+  return series.find((entry) => entry.id === gameId)?.color ?? 'var(--chart-deemphasis)';
 }
 
 export function nameOf(series: readonly GameSeries[], gameId: GameId): string {

@@ -11,8 +11,8 @@ const ROW = 40;
 const LABEL_WIDTH = 104;
 const VALUE_WIDTH = 96;
 const SURFACE_GAP = 2;
-const GUESTS = 'var(--series-7)';
-const BOTS = 'var(--deemphasis)';
+const GUESTS = 'var(--chart-7)';
+const BOTS = 'var(--chart-deemphasis)';
 
 /** Emphasis form: guests in the accent, bots in gray, as shares of all play. */
 export function PopulationChart({ population }: { population: PopulationDto }) {
@@ -49,9 +49,9 @@ export function PopulationChart({ population }: { population: PopulationDto }) {
       table={table}
       legend={legend}
     >
-      <div ref={ref} className="chart" onPointerLeave={hover.hide}>
+      <div ref={ref} className="relative w-full" onPointerLeave={hover.hide}>
         {width > 0 && (
-          <svg width={width} height={measures.length * ROW}>
+          <svg className="block overflow-visible" width={width} height={measures.length * ROW}>
             <title>Share of rounds and wagers by guests and bots</title>
             {measures.map((measure, index) => {
               const y = index * ROW + (ROW - BAR) / 2;
@@ -70,7 +70,12 @@ export function PopulationChart({ population }: { population: PopulationDto }) {
                   }
                 >
                   <rect x={0} y={index * ROW} width={width} height={ROW} fill="transparent" />
-                  <text x={0} y={y + BAR / 2} className="row-label" dominantBaseline="middle">
+                  <text
+                    x={0}
+                    y={y + BAR / 2}
+                    className="fill-muted-foreground text-xs"
+                    dominantBaseline="middle"
+                  >
                     {measure.label}
                   </text>
                   {guestWidth > 0 && (
@@ -80,7 +85,7 @@ export function PopulationChart({ population }: { population: PopulationDto }) {
                   <text
                     x={LABEL_WIDTH + plotWidth + 10}
                     y={y + BAR / 2}
-                    className="value-label"
+                    className="fill-muted-foreground text-[11px]"
                     dominantBaseline="middle"
                   >
                     {guestShare === null ? 'no play yet' : `guests ${formatPercent(guestShare)}`}
