@@ -13,5 +13,5 @@ export function PhaserHost() {
     return () => game.destroy(true);
   }, [bus]);
 
-  return <div ref={host} className="phaser-host" data-testid="game-canvas" />;
+  return <div ref={host} className="absolute inset-0" data-testid="game-canvas" />;
 }
