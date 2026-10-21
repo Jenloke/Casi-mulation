@@ -4,6 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Casino Analytics</title>
+    <script>
+      // Pick the theme before the first paint; ThemeProvider (@casino/ui) takes over after.
+      try {
+        const stored = localStorage.getItem('casino-theme');
+        const dark =
+          stored === 'dark' ||
+          (stored !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.classList.toggle('dark', dark);
+      } catch {}
+    </script>
   </head>
   <body>
     <div id="root"></div>
