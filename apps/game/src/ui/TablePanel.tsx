@@ -1,3 +1,13 @@
+import { Button } from '@casino/ui/components/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@casino/ui/components/card';
+import { SparklesIcon } from 'lucide-react';
 import { BetForm } from './BetForm.tsx';
 import { percent } from './format.ts';
 import { useClientState, useSendCommand } from './GameContext.tsx';
@@ -16,32 +26,47 @@ export function TablePanel() {
   const activeItem = self.inventory.find((item) => item.gameId === game.id && item.active);
   const activeItemName = welcome.items.find((item) => item.id === activeItem?.itemId)?.name;
   return (
-    <section className="panel" data-testid="table-panel">
-      <h2>{game.name} table</h2>
-      <p className="muted">
-        Bets {game.minBet}–{game.maxBet} · theoretical RTP {percent(game.theoreticalRtp)}
-      </p>
-      <BetForm
-        key={game.id}
-        game={game}
-        disabled={busy}
-        onBet={(amount, option) => send({ type: 'placeBet', amount, option })}
-      />
-      {activeItem && (
-        <p className="item-note">
-          {activeItemName} active · {activeItem.usesLeft} uses left
-        </p>
-      )}
-      {round && (
-        <RoundCard
-          round={round}
-          disabled={self.autoPlay}
-          onAction={(action) => send({ type: 'roundAction', action })}
+    <Card size="sm" data-testid="table-panel">
+      <CardHeader>
+        <CardTitle>
+          <h2>{game.name} table</h2>
+        </CardTitle>
+        <CardDescription>
+          Bets {game.minBet}–{game.maxBet} · theoretical RTP {percent(game.theoreticalRtp)}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3">
+        <BetForm
+          key={game.id}
+          game={game}
+          disabled={busy}
+          onBet={(amount, option) => send({ type: 'placeBet', amount, option })}
         />
-      )}
-      <button type="button" disabled={busy} onClick={() => send({ type: 'leaveSeat' })}>
-        Leave table
-      </button>
-    </section>
+        {activeItem && (
+          <p className="flex items-center gap-1.5 text-success">
+            <SparklesIcon className="size-4" />
+            {activeItemName} active · {activeItem.usesLeft} uses left
+          </p>
+        )}
+        {round && (
+          <RoundCard
+            round={round}
+            disabled={self.autoPlay}
+            onAction={(action) => send({ type: 'roundAction', action })}
+          />
+        )}
+      </CardContent>
+      <CardFooter>
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full"
+          disabled={busy}
+          onClick={() => send({ type: 'leaveSeat' })}
+        >
+          Leave table
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }
