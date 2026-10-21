@@ -51,6 +51,7 @@ pnpm lint     # Biome: lint + formatting + import order
 pnpm test     # Vitest: core rules, Monte Carlo RTP per game, server, UI helpers
 pnpm e2e      # Playwright smoke test; starts the server, game and dashboard itself
 pnpm format   # apply Biome's fixes
+pnpm ui:add dialog   # add a shadcn/ui component to the shared design system
 ```
 
 Before the first `pnpm e2e`, install the browser once:
@@ -73,8 +74,9 @@ Before the first `pnpm e2e`, install the browser once:
 | --- | --- |
 | `packages/contracts` | Message and DTO types shared by server and clients |
 | `packages/core` | All game logic as plain TypeScript classes (no DOM, Node or frameworks) |
+| `packages/ui` | Shared design system: shadcn/ui components, Tailwind CSS v4, the light and dark theme |
 | `apps/server` | Fastify + WebSocket: runs the authoritative game loop and the analytics API |
-| `apps/game` | React 19 + Vite 8 HUD around a Phaser 4 canvas |
-| `apps/dashboard` | React 19 + Vite 8 analytics dashboard |
+| `apps/game` | React 19 + Vite 8 HUD (shadcn/ui) around a Phaser 4 canvas |
+| `apps/dashboard` | React 19 + Vite 8 analytics dashboard (shadcn/ui) |
 | `e2e` | Playwright smoke test for game + dashboard |
-| `docs` | [Architecture](docs/architecture.md), [adding a game](docs/adding-a-game.md), [decisions](docs/decisions.md) |
+| `docs` | [Architecture](docs/architecture.md), [UI](docs/ui.md), [adding a game](docs/adding-a-game.md), [decisions](docs/decisions.md) |

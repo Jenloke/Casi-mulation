@@ -13,6 +13,7 @@ pnpm lint             # biome check .   (pnpm format applies fixes)
 pnpm test             # vitest in every package
 pnpm e2e              # Playwright smoke test; starts all three apps itself
 pnpm --filter @casino/core test monteCarlo   # one package / one file
+pnpm ui:add dialog    # add a shadcn/ui component to packages/ui (pinned CLI, run in that package)
 ```
 
 Every change should leave `pnpm build`, `pnpm lint`, `pnpm test` and `pnpm e2e` green.
@@ -28,6 +29,11 @@ Every change should leave `pnpm build`, `pnpm lint`, `pnpm test` and `pnpm e2e` 
   runs the loop and serves analytics.
 - `apps/game`, `apps/dashboard`: render and send commands. **No game logic.** Phaser and
   React talk only through the typed `GameBus` (`apps/game/src/bus`).
+- `packages/ui`: the design system for every browser app: shadcn/ui on Base UI (Nova style),
+  Tailwind v4 and the theme tokens. Read `docs/ui.md` before UI work. Apps **write no CSS**:
+  import `@casino/ui/globals.css` once and style with `@casino/ui` components plus Tailwind
+  utilities on semantic tokens (`bg-card`, `text-muted-foreground`); no hex colors in app code
+  (the Phaser canvas excepted).
 
 ## Conventions
 
@@ -48,6 +54,11 @@ Every change should leave `pnpm build`, `pnpm lint`, `pnpm test` and `pnpm e2e` 
   implementations. Keep it that way so a database adapter can drop in.
 - Character look and name live in `CharacterProfile`; extend it, don't put look fields on
   `Player`.
+- Files in `packages/ui/src/{components,hooks,lib}` are vendored shadcn code: change them only
+  through `pnpm ui:add` (`--diff` to compare, `--overwrite` to update). Biome lints them but
+  doesn't format them. Never run `shadcn init`/`apply`; they would replace the hand-tuned theme.
+- No arrow-key focus groups (`ToggleGroup`, `RadioGroup`, `Tabs`) in the game HUD: they cancel
+  arrow keys and the character stops walking. Use `aria-pressed` buttons for choices.
 
 ## Extending
 
@@ -56,6 +67,9 @@ Every change should leave `pnpm build`, `pnpm lint`, `pnpm test` and `pnpm e2e` 
   `docs/adding-a-game.md`. The Monte Carlo suite picks it up automatically.
 - **Item:** one entry in `items/itemDefinitions.ts` (boost ≤ `MAX_ODDS_BOOST`).
 - **Bot personality:** one entry in `ai/personalities.ts`.
+- **UI component:** `pnpm ui:add <name>`, then import `@casino/ui/components/<name>`.
+- **Web app:** the five steps in `docs/ui.md` (deps, Tailwind plugin, `globals.css`,
+  `components.json`, dark-mode setup).
 
 ## Testing notes
 
@@ -65,7 +79,8 @@ Every change should leave `pnpm build`, `pnpm lint`, `pnpm test` and `pnpm e2e` 
   change a paytable, fix the theoretical value instead of loosening the tolerance.
 - The e2e test relies on `data-testid`s in the HUD (`chip-count`, `player-pos`,
   `table-panel`, `shop-panel`, `inventory-panel`, `round-result`, ...) and the dashboard
-  (`total-rounds`, `humans-online`, `leaderboard`). Keep them stable.
+  (`total-rounds`, `humans-online`, `leaderboard`), and on button names (`Shop`, `Place bet`,
+  `Spin`, `Deal`, `Stand`, `Leave table`, `Start auto-play`, `4x`, `Buy <item>`). Keep them stable.
 
 ## Decisions
 
