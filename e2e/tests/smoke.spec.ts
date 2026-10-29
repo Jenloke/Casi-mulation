@@ -49,6 +49,14 @@ test('walk the floor, play every game, use an item, auto-play and watch the dash
   await expect(table.getByTestId('round-result')).toBeVisible();
   await table.getByRole('button', { name: 'Leave table' }).click();
 
+  // Baccarat, backing the banker.
+  await walkToTable(page, 'Baccarat');
+  await table.getByRole('button', { name: /^Banker/ }).click();
+  await table.getByRole('button', { name: 'Place bet' }).click();
+  await expect(table.getByTestId('round-result')).toBeVisible();
+  await expect(table.getByTestId('round-card')).toContainText('Bet on Banker');
+  await table.getByRole('button', { name: 'Leave table' }).click();
+
   // Blackjack: stand whenever the hand waits for a decision.
   await walkToTable(page, 'Blackjack');
   await table.getByRole('button', { name: 'Deal' }).click();
