@@ -83,6 +83,44 @@ describe('AnalyticsAggregator', () => {
     ]);
     expect(snapshot.timeline.buckets.at(-1)?.roundsByGame).toEqual({ slots: 2 });
   });
+
+  it("weights each bet's theoretical RTP by the chips wagered on it", () => {
+    const dice: GameInfoDto = {
+      id: 'dice',
+      name: 'Dice',
+      minBet: 1,
+      maxBet: 50,
+      theoreticalRtp: 0.98,
+      betOptions: [
+        { id: 'high', label: 'High', payout: '1:1', theoreticalRtp: 0.98, numberRange: null },
+        {
+          id: 'face',
+          label: 'Face',
+          payout: '5:1',
+          theoreticalRtp: 0.9,
+          numberRange: { min: 1, max: 6 },
+        },
+      ],
+    };
+    const aggregator = new AnalyticsAggregator();
+    const theoretical = () => aggregator.snapshot(5_000, [dice], []).games[0]?.theoreticalRtp;
+    const bet = (roundId: string, option: string, amount: number) =>
+      aggregator.apply({
+        type: 'BetPlaced',
+        playerId: 'bot-1',
+        playerKind: 'bot',
+        at: 1_000,
+        gameId: 'dice',
+        roundId,
+        amount,
+        option,
+        itemId: null,
+      });
+    expect(theoretical()).toBe(0.98);
+    bet('r1', 'high', 30);
+    bet('r2', 'face:4', 10);
+    expect(theoretical()).toBeCloseTo((30 * 0.98 + 10 * 0.9) / 40, 12);
+  });
 });
 
 describe('RoundsTimeline', () => {
