@@ -56,7 +56,12 @@ describe('casino server', () => {
     for (let beat = 0; beat < 3_000; beat++) server.loop.step();
     const response = await server.app.inject({ url: ANALYTICS_PATH });
     const snapshot = response.json<AnalyticsSnapshotDto>();
-    expect(snapshot.games.map((game) => game.gameId)).toEqual(['slots', 'roulette', 'blackjack']);
+    expect(snapshot.games.map((game) => game.gameId)).toEqual([
+      'slots',
+      'roulette',
+      'blackjack',
+      'baccarat',
+    ]);
     expect(snapshot.totals.rounds).toBeGreaterThan(0);
     expect(snapshot.population.botsOnline).toBeGreaterThan(0);
     expect(snapshot.leaderboard.length).toBeGreaterThan(0);

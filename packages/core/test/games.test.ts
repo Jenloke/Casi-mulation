@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
+import { BaccaratGame } from '../src/games/baccarat/BaccaratGame.ts';
 import { BaccaratPaytable } from '../src/games/baccarat/BaccaratPaytable.ts';
-import { bankerDraws, coupWinner, dealCoup, handTotal } from '../src/games/baccarat/coup.ts';
+import {
+  bankerDraws,
+  coupOdds,
+  coupWinner,
+  dealCoup,
+  handTotal,
+} from '../src/games/baccarat/coup.ts';
 import { BasicStrategy } from '../src/games/blackjack/BasicStrategy.ts';
 import { BlackjackGame, type BlackjackState } from '../src/games/blackjack/BlackjackGame.ts';
 import { handValue, isBlackjack } from '../src/games/blackjack/hand.ts';
@@ -146,6 +153,30 @@ describe('baccarat', () => {
     expect(paytable.payout('banker', 'tie', 20)).toBe(20);
     expect(paytable.payout('tie', 'banker', 20)).toBe(0);
     expect(paytable.payout('player', 'banker', 20)).toBe(0);
+  });
+
+  it('has the exact infinite-shoe odds and returns', () => {
+    const odds = coupOdds();
+    expect(odds.player + odds.banker + odds.tie).toBeCloseTo(1, 12);
+    const game = new BaccaratGame();
+    const rtp = Object.fromEntries(game.betOptions.map((o) => [o.id, o.theoreticalRtp]));
+    // House edges 1.228% (player), 1.064% (banker) and 14.117% (tie).
+    expect(rtp.player).toBeCloseTo(0.98772, 5);
+    expect(rtp.banker).toBeCloseTo(0.98936, 5);
+    expect(rtp.tie).toBeCloseTo(0.85883, 5);
+    expect(game.theoreticalRtp).toBe(rtp.banker);
+  });
+
+  it('re-deals a losing coup when the item boost comes through', () => {
+    const game = new BaccaratGame();
+    const ctx = { rng: new SeededRng(3), boost: 1 };
+    const details = Array.from(
+      { length: 20 },
+      () => game.startRound({ amount: 20, option: 'tie' }, ctx).view.details,
+    );
+    expect(details.some((lines) => lines.some((line) => line.startsWith('Lucky re-deal')))).toBe(
+      true,
+    );
   });
 });
 
