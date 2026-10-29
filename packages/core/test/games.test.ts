@@ -3,6 +3,7 @@ import { BasicStrategy } from '../src/games/blackjack/BasicStrategy.ts';
 import { BlackjackGame, type BlackjackState } from '../src/games/blackjack/BlackjackGame.ts';
 import { handValue, isBlackjack } from '../src/games/blackjack/hand.ts';
 import type { Card, Rank } from '../src/games/cards.ts';
+import { createDefaultGameRegistry } from '../src/games/defaultGames.ts';
 import { RouletteWheel } from '../src/games/roulette/RouletteWheel.ts';
 import { SlotPaytable } from '../src/games/slots/SlotPaytable.ts';
 import { SlotsGame } from '../src/games/slots/SlotsGame.ts';
@@ -87,5 +88,12 @@ describe('blackjack', () => {
     expect(game.applyAction(state(cards('2', '3'), cards('K', '7')), 'hit', ctx).status).toBe(
       'pending',
     );
+  });
+});
+
+describe('every game', () => {
+  it.each(createDefaultGameRegistry().all())('$name quotes its best bet as its RTP', (game) => {
+    const best = Math.max(...game.betOptions.map((option) => option.theoreticalRtp));
+    expect(game.theoreticalRtp).toBe(best);
   });
 });

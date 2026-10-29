@@ -8,11 +8,17 @@ export class SlotsGame implements CasinoGame<never> {
   readonly name = 'Slots';
   readonly minBet = 1;
   readonly maxBet = 50;
-  readonly betOptions: readonly BetOptionDto[] = [
-    { id: 'spin', label: 'Spin', payout: '2x to 100x', numberRange: null },
-  ];
   private readonly paytable = new SlotPaytable();
   readonly theoreticalRtp = this.paytable.expectedReturn();
+  readonly betOptions: readonly BetOptionDto[] = [
+    {
+      id: 'spin',
+      label: 'Spin',
+      payout: '2x to 100x',
+      theoreticalRtp: this.theoreticalRtp,
+      numberRange: null,
+    },
+  ];
 
   isValidOption(option: string): boolean {
     return option === 'spin';

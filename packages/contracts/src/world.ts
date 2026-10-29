@@ -93,6 +93,8 @@ export interface BetOptionDto {
   readonly id: string;
   readonly label: string;
   readonly payout: string;
+  /** Long-run payout / wager of this bet without items. */
+  readonly theoreticalRtp: number;
   /** When set, the bet also needs a number in this range and is sent as `${id}:${n}`. */
   readonly numberRange: { readonly min: number; readonly max: number } | null;
 }
