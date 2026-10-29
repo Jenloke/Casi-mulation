@@ -18,7 +18,7 @@ export const PERSONALITIES: readonly Personality[] = [
   {
     id: 'high-roller',
     label: 'High roller',
-    gameWeights: { roulette: 4, blackjack: 3, slots: 1 },
+    gameWeights: { baccarat: 5, roulette: 4, blackjack: 3, slots: 1 },
     betFraction: 0.1,
     roundsPerVisit: [3, 6],
     thinkTicks: [4, 10],
