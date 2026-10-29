@@ -1,8 +1,8 @@
 import type { BetOptionDto } from '@casino/contracts';
 import type { Rng } from '../../random/Rng.ts';
 import type { CasinoGame, RoundContext, RoundStep, Wager } from '../CasinoGame.ts';
+import { type Card, formatCards, InfiniteShoe } from '../cards.ts';
 import { BasicStrategy } from './BasicStrategy.ts';
-import { type Card, formatCards, InfiniteShoe } from './cards.ts';
 import { handValue, isBlackjack } from './hand.ts';
 
 export interface BlackjackState {
