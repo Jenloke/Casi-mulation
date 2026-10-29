@@ -15,6 +15,7 @@ const GAME_COLORS: Readonly<Record<string, number>> = {
   slots: 0x2f5fd0,
   roulette: 0x9b1d30,
   blackjack: 0x1f7a3f,
+  baccarat: 0x5b3a9e,
 };
 const SEAT_COLOR = 0xd4a937;
 const LABEL_STYLE = { fontFamily: 'system-ui, sans-serif', fontSize: '10px', color: '#f4f1e8' };

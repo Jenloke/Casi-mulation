@@ -37,11 +37,16 @@ export function simulateRtp(game: CasinoGame, options: SimulationOptions): RtpSa
   return { rtp, standardError: Math.sqrt(variance / options.rounds) };
 }
 
-/** One option string per bet option; numbered options get a mid-range number. */
-export function optionsToTest(game: CasinoGame): string[] {
-  return game.betOptions.map((option) => {
-    if (!option.numberRange) return option.id;
-    const { min, max } = option.numberRange;
-    return `${option.id}:${Math.floor((min + max) / 2)}`;
+export interface OptionToTest {
+  readonly option: string;
+  readonly theoreticalRtp: number;
+}
+
+/** One wager option per bet option, with its RTP; numbered options get a mid-range number. */
+export function optionsToTest(game: CasinoGame): OptionToTest[] {
+  return game.betOptions.map(({ id, numberRange, theoreticalRtp }) => {
+    if (!numberRange) return { option: id, theoreticalRtp };
+    const { min, max } = numberRange;
+    return { option: `${id}:${Math.floor((min + max) / 2)}`, theoreticalRtp };
   });
 }

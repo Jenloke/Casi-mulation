@@ -1,4 +1,4 @@
-import type { Card } from './cards.ts';
+import type { Card } from '../cards.ts';
 import { cardPoints, handValue } from './hand.ts';
 
 export type BlackjackAction = 'hit' | 'stand';

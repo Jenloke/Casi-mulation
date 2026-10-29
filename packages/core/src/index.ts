@@ -12,6 +12,7 @@ export { type DomainEventStore, InMemoryDomainEventStore } from './events/Domain
 export { CASINO_FLOOR } from './floor/casinoFloor.ts';
 export { FloorMap, type Seat, type Table } from './floor/FloorMap.ts';
 export { type FloorDefinition, FloorMapParser } from './floor/FloorMapParser.ts';
+export { BaccaratGame } from './games/baccarat/BaccaratGame.ts';
 export { BlackjackGame } from './games/blackjack/BlackjackGame.ts';
 export type { CasinoGame, RoundContext, RoundStep, RoundView, Wager } from './games/CasinoGame.ts';
 export { createDefaultGameRegistry } from './games/defaultGames.ts';

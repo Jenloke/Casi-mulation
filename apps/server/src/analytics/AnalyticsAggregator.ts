@@ -37,6 +37,8 @@ export type EventAnalytics = Pick<
 export class AnalyticsAggregator {
   private readonly byGame = new Map<GameId, Volume>();
   private readonly byKind: Record<PlayerKind, Volume> = { human: volume(), bot: volume() };
+  /** Chips wagered per game and bet option id, to weight each bet's theoretical RTP. */
+  private readonly wageredByBet = new Map<GameId, Map<string, number>>();
   private readonly withItem = new Map<GameId, WinTally>();
   private readonly withoutItem = new Map<GameId, WinTally>();
   private readonly uses = new Map<string, number>();
@@ -66,7 +68,7 @@ export class AnalyticsAggregator {
         name: game.name,
         ...stats,
         actualRtp: ratio(stats.paid, stats.wagered),
-        theoreticalRtp: game.theoreticalRtp,
+        theoreticalRtp: this.theoreticalRtp(game),
       };
     });
     const totals = volume();
@@ -98,6 +100,9 @@ export class AnalyticsAggregator {
   private onBet(event: BetPlaced): void {
     this.volumeFor(event.gameId).wagered += event.amount;
     this.byKind[event.playerKind].wagered += event.amount;
+    const bets = this.wageredByBet.get(event.gameId) ?? new Map<string, number>();
+    increment(bets, betId(event.option), event.amount);
+    this.wageredByBet.set(event.gameId, bets);
   }
 
   private onPayout(event: PayoutSettled): void {
@@ -113,6 +118,22 @@ export class AnalyticsAggregator {
     this.timeline.add(event.at, event.gameId);
   }
 
+  /**
+   * What the bets actually placed should return: each bet option's theoretical RTP weighted
+   * by the chips wagered on it. Until something is wagered, the game's own figure.
+   */
+  private theoreticalRtp(game: GameInfoDto): number {
+    const bets = this.wageredByBet.get(game.id);
+    let wagered = 0;
+    let expected = 0;
+    for (const option of game.betOptions) {
+      const amount = bets?.get(option.id) ?? 0;
+      wagered += amount;
+      expected += amount * option.theoreticalRtp;
+    }
+    return wagered > 0 ? expected / wagered : game.theoreticalRtp;
+  }
+
   private volumeFor(gameId: GameId): Volume {
     const stats = this.byGame.get(gameId) ?? volume();
     this.byGame.set(gameId, stats);
@@ -124,8 +145,13 @@ function volume(): Volume {
   return { rounds: 0, wagered: 0, paid: 0 };
 }
 
-function increment(counts: Map<string, number>, key: string): void {
-  counts.set(key, (counts.get(key) ?? 0) + 1);
+function increment(counts: Map<string, number>, key: string, by = 1): void {
+  counts.set(key, (counts.get(key) ?? 0) + by);
+}
+
+/** The bet option id of a wager's option; numbered bets arrive as `${id}:${n}`. */
+function betId(option: string): string {
+  return option.split(':', 1)[0] ?? option;
 }
 
 function ratio(part: number, whole: number): number | null {

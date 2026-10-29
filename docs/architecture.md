@@ -43,7 +43,7 @@ service:
 | `world/` | `Navigator`, `SeatingService`, `MovementSystem` | Click/arrow → path, seat reservation, one tile per 2 ticks |
 | `world/` | `RoundService`, `ShopService`, `ChipBank` | Bets/payouts/item use, buying items, topping up broke guests |
 | `world/` | `CommandHandler`, `TimeScale`, `WorldSnapshotter` | Command routing, shared sim speed, DTOs for clients |
-| `games/` | `CasinoGame`, `GameRegistry`, `SlotsGame`, `RouletteGame`, `BlackjackGame` | Rules, odds, theoretical RTP |
+| `games/` | `CasinoGame`, `GameRegistry`, `SlotsGame`, `RouletteGame`, `BlackjackGame`, `BaccaratGame` | Rules, odds, theoretical RTP per bet |
 | `items/` | `ItemCatalog`, `Inventory`, `ITEM_DEFINITIONS` | Shop data, boost cap, uses, active item per game |
 | `players/` | `Player`, `CharacterProfile`, `PlayerRepository` | Character state and its default look |
 | `ai/` | `BotBrain`, `Personality`, `BotDirector`, `BrainRegistry` | One AI for bots and auto-play, bot population |
@@ -136,10 +136,10 @@ own. Details, token meanings and the steps for a new app: [ui.md](ui.md).
 ## Tests
 
 - `packages/core/test`: rules (floor parser, A\*, games, items, world flows, AI) and a
-  data-driven Monte Carlo suite that checks every registered game's RTP against its
-  theoretical value, with and without every item boost. `architecture.test.ts` fails if
+  data-driven Monte Carlo suite that checks every bet option of every registered game
+  against its theoretical RTP, with and without every item boost. `architecture.test.ts` fails if
   core uses the global random source, wall-clock time, the DOM, or Node/React/Phaser imports.
 - `apps/server/test`: message validation, analytics aggregation, hub and HTTP/WebSocket wiring.
 - `apps/*/src/**/*.test.ts`: UI helpers (event bus, chart geometry).
-- `e2e/tests/smoke.spec.ts`: one Playwright run through walking, shopping, all three games,
+- `e2e/tests/smoke.spec.ts`: one Playwright run through walking, shopping, every game,
   auto-play and the live dashboard.

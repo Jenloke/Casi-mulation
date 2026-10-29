@@ -27,8 +27,8 @@ export class HighCardGame implements CasinoGame<never> {
   readonly maxBet = 100;
   readonly theoreticalRtp = (2 * 6) / 13; // 2x payout on 6 winning cards out of 13
   readonly betOptions: readonly BetOptionDto[] = [
-    { id: 'high', label: 'High (8-K)', payout: '1:1', numberRange: null },
-    { id: 'low', label: 'Low (A-6)', payout: '1:1', numberRange: null },
+    { id: 'high', label: 'High (8-K)', payout: '1:1', theoreticalRtp: 12 / 13, numberRange: null },
+    { id: 'low', label: 'Low (A-6)', payout: '1:1', theoreticalRtp: 12 / 13, numberRange: null },
   ];
 
   isValidOption(option: string): boolean {
@@ -59,8 +59,13 @@ Rules every game follows:
 - **`payout` is everything handed back, stake included,** and a whole number of chips.
   Pick `minBet` and multipliers so it stays whole.
 - **`theoreticalRtp` is the long-run payout ÷ wager without items.** Compute it exactly
-  when you can (slots enumerates its reels); otherwise measure it once with a large
-  simulation and say so in a comment, as blackjack does.
+  when you can (slots enumerates its reels, baccarat its tableau); otherwise measure it once
+  with a large simulation and say so in a comment, as blackjack does.
+- **Every bet option carries its own `theoreticalRtp`.** When the bets differ (baccarat's tie
+  returns far less than its banker bet), the game-level figure is the best bet's, which the
+  table panel shows; a test checks that. The Monte Carlo suite tests each option against
+  its own figure, and the dashboard's theoretical RTP weights each option by the chips
+  actually wagered on it.
 - **Use `ctx.boost` as a small odds boost** (it is already capped at `MAX_ODDS_BOOST`).
   The pattern so far is a re-roll of a losing outcome with probability `boost`, which can
   at most scale returns by `1 + boost`; the Monte Carlo test checks that bound.
@@ -77,6 +82,7 @@ return new GameRegistry()
   .register(new SlotsGame())
   .register(new RouletteGame())
   .register(new BlackjackGame())
+  .register(new BaccaratGame())
   .register(new HighCardGame());
 ```
 
@@ -88,7 +94,7 @@ Registry order is the game's color slot on the dashboard, so append, don't inser
 the glyph is one table, and its `o` seats must touch only that table:
 
 ```ts
-tableGlyphs: { S: 'slots', R: 'roulette', B: 'blackjack', H: 'high-card' },
+tableGlyphs: { S: 'slots', R: 'roulette', B: 'blackjack', P: 'baccarat', H: 'high-card' },
 rows: [
   // ...
   '#..........ooo...............#',
@@ -100,6 +106,9 @@ rows: [
 
 `floor.test.ts` checks every seat is reachable from the entrance. If it fails, leave a floor
 row between your table and its neighbours.
+
+The game client draws unknown games' tables gray; give yours a felt color in `GAME_COLORS`
+(`apps/game/src/phaser/FloorRenderer.ts`).
 
 ## 4. Optional: items
 
@@ -115,8 +124,8 @@ Add an entry to `packages/core/src/items/itemDefinitions.ts`:
 ## 5. Test it
 
 `pnpm test` already runs the data-driven Monte Carlo suite (`monteCarlo.test.ts`) against
-every registered game. It checks each bet option's RTP against `theoreticalRtp`, then the
-RTP with each item boost for that game and with the maximum boost. Add unit tests for the
+every registered game. It checks each bet option's RTP against that option's `theoreticalRtp`,
+then the first option's RTP with each item boost for that game and with the maximum boost. Add unit tests for the
 rules themselves in `packages/core/test/games.test.ts`.
 
 Bots start playing the new game straight away. Personalities without an appetite listed

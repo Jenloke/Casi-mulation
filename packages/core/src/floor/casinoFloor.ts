@@ -5,10 +5,11 @@ import type { FloorDefinition } from './FloorMapParser.ts';
  *
  *   #  wall          .  floor        E  entrance
  *   $  shop counter  c  shop tile    o  seat
- *   S  slot machine  R  roulette     B  blackjack   (a connected run of one letter = one table)
+ *   S  slot machine  R  roulette     B  blackjack   P  baccarat (punto banco)
+ *   (a connected run of one letter = one table)
  */
 export const CASINO_FLOOR: FloorDefinition = {
-  tableGlyphs: { S: 'slots', R: 'roulette', B: 'blackjack' },
+  tableGlyphs: { S: 'slots', R: 'roulette', B: 'blackjack', P: 'baccarat' },
   rows: [
     '##############################',
     '#............................#',
@@ -19,13 +20,13 @@ export const CASINO_FLOOR: FloorDefinition = {
     '#........S.S.S.S...S.S.S.S...#',
     '#............................#',
     '#............................#',
-    '#.......ooo........ooo.......#',
-    '#.......RRR........BBB.......#',
-    '#.......ooo........ooo.......#',
+    '#.......ooo..oooo..ooo.......#',
+    '#.......RRR..PPPP..BBB.......#',
+    '#.......ooo..oooo..ooo.......#',
     '#............................#',
-    '#.......ooo........ooo.......#',
-    '#.......BBB........RRR.......#',
-    '#.......ooo........ooo.......#',
+    '#.......ooo..oooo..ooo.......#',
+    '#.......BBB..PPPP..RRR.......#',
+    '#.......ooo..oooo..ooo.......#',
     '#............................#',
     '#............................#',
     '##############EE##############',

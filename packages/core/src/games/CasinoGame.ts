@@ -38,7 +38,10 @@ export interface CasinoGame<TState = unknown> {
   readonly name: string;
   readonly minBet: number;
   readonly maxBet: number;
-  /** Long-run payout / wager without items; shown next to the actual RTP on the dashboard. */
+  /**
+   * Long-run payout / wager without items. Each bet option carries its own; when they differ
+   * (baccarat's tie), this is the best bet's, the figure a casino quotes.
+   */
   readonly theoreticalRtp: number;
   readonly betOptions: readonly BetOptionDto[];
   isValidOption(option: string): boolean;
