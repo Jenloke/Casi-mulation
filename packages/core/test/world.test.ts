@@ -144,14 +144,14 @@ describe('CasinoWorld', () => {
     const botGames = ofType(events, 'PayoutSettled')
       .filter((event) => event.playerKind === 'bot')
       .map((event) => event.gameId);
-    expect([...new Set(botGames)].sort()).toEqual(['blackjack', 'roulette', 'slots']);
+    expect([...new Set(botGames)].sort()).toEqual(['baccarat', 'blackjack', 'roulette', 'slots']);
   });
 
   it('snapshots the floor, players and private state for clients', () => {
     const { world } = createWorld(2);
     const guest = world.join();
     runUntil(world, () => false, 20);
-    expect(world.floorDto().tables).toHaveLength(12);
+    expect(world.floorDto().tables).toHaveLength(14);
     expect(world.snapshot().players.map((player) => player.id)).toContain(guest.id);
     expect(world.selfState(guest.id)).toMatchObject({ playerId: guest.id, chips: 1000 });
   });
