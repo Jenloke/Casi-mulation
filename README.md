@@ -1,7 +1,7 @@
 # Casi-mulation
 
 A browser "RPG casino": walk a top-down, grid-based casino floor, take a seat at a table and
-play slots, roulette or blackjack alongside AI bots and other guests. A separate dashboard
+play slots, roulette, blackjack or baccarat alongside AI bots and other guests. A separate dashboard
 shows what is happening on the floor, live.
 
 ## Requirements
@@ -34,8 +34,8 @@ Open the game in a second browser tab to join as another guest.
 - **Walk** with the arrow keys or click a tile; the path is found with A\*.
 - **Sit down** by clicking a table (you walk to its nearest free seat) or a seat. The
   *Walk to* panel does the same with one click.
-- **Bet** in the table panel. Slots and roulette settle at once; blackjack waits for
-  *Hit* or *Stand*. Your chips are the only currency. If you run dry you get topped back up.
+- **Bet** in the table panel. Slots, roulette and baccarat (back the Player, the Banker or
+  a Tie) settle at once; blackjack waits for *Hit* or *Stand*. Your chips are the only currency. If you run dry you get topped back up.
 - **Shop** at the gold counter. Each item helps one game with a small odds boost (at most
   10%) for a limited number of rounds. One item per game is active; toggle it in the
   inventory.

@@ -9,6 +9,7 @@ export class RouletteGame implements CasinoGame<never> {
   readonly minBet = 5;
   readonly maxBet = 200;
   readonly theoreticalRtp = 36 / POCKETS;
+  /** Every bet returns 36/37: the zero is the whole house edge. */
   readonly betOptions: readonly BetOptionDto[] = [
     { id: 'red', label: 'Red', payout: '1:1', numberRange: null },
     { id: 'black', label: 'Black', payout: '1:1', numberRange: null },
@@ -22,7 +23,7 @@ export class RouletteGame implements CasinoGame<never> {
       payout: '35:1',
       numberRange: { min: 0, max: POCKETS - 1 },
     },
-  ];
+  ].map((option) => ({ ...option, theoreticalRtp: this.theoreticalRtp }));
   private readonly wheel = new RouletteWheel();
 
   isValidOption(option: string): boolean {

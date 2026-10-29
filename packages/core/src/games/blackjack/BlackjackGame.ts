@@ -1,8 +1,8 @@
 import type { BetOptionDto } from '@casino/contracts';
 import type { Rng } from '../../random/Rng.ts';
 import type { CasinoGame, RoundContext, RoundStep, Wager } from '../CasinoGame.ts';
+import { type Card, formatCards, InfiniteShoe } from '../cards.ts';
 import { BasicStrategy } from './BasicStrategy.ts';
-import { type Card, formatCards, InfiniteShoe } from './cards.ts';
 import { handValue, isBlackjack } from './hand.ts';
 
 export interface BlackjackState {
@@ -28,7 +28,13 @@ export class BlackjackGame implements CasinoGame<BlackjackState> {
   /** BasicStrategy's return, measured over 10M simulated rounds (see docs/decisions.md). */
   readonly theoreticalRtp = 0.9758;
   readonly betOptions: readonly BetOptionDto[] = [
-    { id: 'hand', label: 'Deal', payout: '1:1, blackjack 3:2', numberRange: null },
+    {
+      id: 'hand',
+      label: 'Deal',
+      payout: '1:1, blackjack 3:2',
+      theoreticalRtp: this.theoreticalRtp,
+      numberRange: null,
+    },
   ];
   private readonly shoe = new InfiniteShoe();
   private readonly strategy = new BasicStrategy();

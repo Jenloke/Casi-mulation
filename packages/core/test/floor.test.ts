@@ -14,7 +14,8 @@ describe('casino floor', () => {
   it('has tables in the middle, a shop and an entrance', () => {
     const count = (gameId: string) => floor.tables.filter((t) => t.gameId === gameId).length;
     expect([floor.width, floor.height]).toEqual([30, 19]);
-    expect([count('slots'), count('roulette'), count('blackjack')]).toEqual([8, 2, 2]);
+    const games = ['slots', 'roulette', 'blackjack', 'baccarat'];
+    expect(games.map(count)).toEqual([8, 2, 2, 2]);
     expect(floor.shopTiles).toHaveLength(5);
     expect(floor.entrances).toHaveLength(2);
   });

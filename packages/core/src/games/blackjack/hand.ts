@@ -1,4 +1,4 @@
-import type { Card } from './cards.ts';
+import type { Card } from '../cards.ts';
 
 export interface HandValue {
   readonly total: number;

@@ -25,7 +25,7 @@ decided and why, so it can be revisited deliberately.
 ## Floor and movement
 
 - **ASCII legend:** `#` wall, `.` floor, `E` entrance, `$` shop counter, `c` shop tile,
-  `o` seat, plus one letter per game (`S`, `R`, `B`). A connected run of one letter is one
+  `o` seat, plus one letter per game (`S`, `R`, `B`, `P`). A connected run of one letter is one
   table; a seat belongs to the single table it touches (the parser rejects ambiguous seats
   and seatless tables).
 - **4-directional A\*,** Manhattan heuristic, deterministic tie-breaking. Players do not block
@@ -135,7 +135,7 @@ decided and why, so it can be revisited deliberately.
   or future, gets an RTP test per bet option, with and without each of its item boosts.
   The tolerance is 4 standard errors of the simulated estimate, not a magic number.
 - **One Playwright smoke test** starts the server (6 bots, seed 7), the game and the
-  dashboard. It walks, buys an item, plays all three games, turns on auto-play at 4x and
+  dashboard. It walks, buys an item, plays every game, turns on auto-play at 4x and
   checks the dashboard updates. It also fails on any uncaught page error.
 - **npm is not supported inside the repository:** npm enforces `devEngines.runtime`
   strictly and refuses to run on a non-26 Node. pnpm reads the same field and downloads
@@ -195,3 +195,40 @@ decided and why, so it can be revisited deliberately.
   `packages/ui` therefore exports `./components`, `./hooks` and `./lib` as directories (an exact
   match skips the bad code path; nothing imports them), and `pnpm ui:add` runs the CLI inside
   `packages/ui`. Drop both once shadcn fixes the bugs.
+
+## Baccarat
+
+- **Punto banco on an infinite shoe.** Player, Banker and Tie bets; the tableau draws every
+  third card, so the round settles at once like roulette. The infinite shoe matches
+  blackjack, keeps rounds independent (each seat plays its own rounds, so there is no shared
+  shoe to track) and makes the odds exactly computable: `coupOdds` walks the tableau over
+  hand totals (10^4 paths). House edges come out at 1.064% banker, 1.228% player and 14.12%
+  tie, the published infinite-deck figures.
+- **Banker wins pay 0.95:1, the 5% commission rounded up to a whole chip;** tie pays 8:1 and
+  hands player and banker bets back. The minimum bet is 20, the smallest stake whose
+  commission is a whole chip, so the theoretical RTP (computed at the minimum bet) is exact
+  there. Other stakes pay up to one chip less, as blackjack's rounded 3:2 does.
+- **Every bet option carries its own theoretical RTP** (`BetOptionDto.theoreticalRtp`).
+  Baccarat's bets differ by 13 points, so one number per game could neither be tested per
+  option nor compared with what was actually bet. The game-level figure is the best bet's
+  (banker, 98.94%), what a casino quotes and what the table panel shows.
+- **The dashboard's theoretical RTP is weighted by the bets actually placed:** each option's
+  RTP times the chips wagered on it, over the chips wagered (the game's own figure before
+  any bet). Bots pick bet options uniformly, so baccarat's mix sits near 94.5%; comparing
+  that with the banker's 98.9% would read as a bug. Games whose bets all share one RTP are
+  unchanged.
+- **Item boost: a losing coup may be dealt again once,** the same re-roll as the other
+  games, so returns scale by at most `1 + boost`. **No baccarat item ships:** the spec asks
+  for 3-5 example items and five already exist (`items.test.ts` enforces it). The Monte
+  Carlo suite still checks the boost at `MAX_ODDS_BOOST`; an item is one entry away.
+- **Floor:** two 4-wide `P` tables (8 seats each) between the roulette and blackjack columns,
+  with two-tile aisles on each side. High rollers favor baccarat (appetite 5).
+- **Shared cards:** `cards.ts` moved from `games/blackjack/` to `games/`, since both card
+  games deal from the same infinite shoe.
+- **Fourth chart color:** baccarat takes categorical slot 4 (amber). Slots 1-4 pass the
+  palette validator on adjacent pairs in both modes, which is the check for the dashboard's
+  forms (lines, and one labeled row per game). All-pairs no longer passes (amber against
+  orange): the reference palette only clears all-pairs for its first three slots, so a fifth
+  game, or any all-pairs form like a scatter, needs facets or an "Other" fold. Light amber is
+  2.11:1 on the surface, relieved like aqua by row labels, the line end labels and the table
+  views.

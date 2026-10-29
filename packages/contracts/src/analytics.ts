@@ -14,6 +14,10 @@ export interface GameStatsDto extends VolumeDto {
   readonly name: string;
   /** paid / wagered; null until something was wagered. */
   readonly actualRtp: number | null;
+  /**
+   * What the bets placed should return: each bet option's theoretical RTP weighted by the
+   * chips wagered on it. The game's headline figure until something is wagered.
+   */
   readonly theoreticalRtp: number;
 }
 
