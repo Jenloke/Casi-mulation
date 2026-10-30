@@ -27,6 +27,6 @@ Code rules:
 - Vitest for core, including a Monte Carlo test per game that checks RTP stays in range with and without items. One Playwright smoke test for game + dashboard.
 - Write README.md (how to run), docs/architecture.md, docs/adding-a-game.md, and CLAUDE.md (architecture + conventions for future work).
 
-Work in milestones: core → server → game → dashboard. After each, run build, lint and tests and fix failures before moving on. Don't stop to ask; make sensible calls and log them in docs/decisions.md. Done when `pnpm install && pnpm dev` starts all three apps, all checks pass, and I can walk the floor, play each game, buy and use an item, toggle auto-play, and watch the dashboard update.
+Build in this order: core → server → game → dashboard. After each, run build, lint and tests and fix failures before moving on. Don't stop to ask; make sensible calls and log them in docs/decisions.md. Done when `pnpm install && pnpm dev` starts all three apps, all checks pass, and I can walk the floor, play each game, buy and use an item, toggle auto-play, and watch the dashboard update.
 
-Commit after each milestone.
+Commit each logical change on its own, with a message that explains it.

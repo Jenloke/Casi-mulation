@@ -1,6 +1,6 @@
 # Decisions
 
-Judgment calls made while building v1, newest milestone last. Each entry says what was
+Judgment calls made while building v1, newest topic last. Each entry says what was
 decided and why, so it can be revisited deliberately.
 
 ## Toolchain
@@ -232,3 +232,16 @@ decided and why, so it can be revisited deliberately.
   game, or any all-pairs form like a scatter, needs facets or an "Other" fold. Light amber is
   2.11:1 on the surface, relieved like aqua by row labels, the line end labels and the table
   views.
+
+## Commits
+
+- **One logical change per commit, not one commit per milestone.** "Milestone" never said how
+  big a step was or what belonged in it, so each commit became everything since the last one:
+  up to 85 files and 5,600 lines, too much to review, revert or bisect. `CLAUDE.md` now defines
+  the unit itself: one change, a `type(scope): summary` subject and green checks.
+- **The existing history was rewritten to match.** Six bundled commits became 85 small ones.
+  Each original commit's tree was reproduced exactly (checked by tree hash), so only the steps
+  between them are new. Author dates are the originals; committer dates show the rewrite. The
+  merge of PR #1 keeps its place. A few in-between states never existed before: placeholder
+  `main.tsx` entry points while each app was assembled, and both stylesheets loaded while the
+  apps moved to the design system.

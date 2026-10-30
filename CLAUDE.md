@@ -84,5 +84,18 @@ Every change should leave `pnpm build`, `pnpm lint`, `pnpm test` and `pnpm e2e` 
 
 ## Decisions
 
-Log non-obvious calls in `docs/decisions.md` (what and why), and commit after each
-milestone.
+Log non-obvious calls in `docs/decisions.md` (what and why).
+
+## Commits
+
+Commit one logical change at a time, as soon as it works. Never bundle work into a "milestone"
+or "phase" commit: if the subject needs "and" to join unrelated things, split it.
+
+- Subject: `type(scope): imperative summary`, 72 columns at most. Types: `feat`, `fix`,
+  `refactor`, `test`, `docs`, `chore`. Scopes: `core`, `contracts`, `server`, `game`,
+  `dashboard`, `ui`, `e2e`; leave it out when a change spans the repo.
+- Body: why the change exists, when the subject doesn't already say. A reader should understand
+  the commit without opening the diff.
+- Split what you would review or revert separately: a move or rename, a contract change, the
+  feature, its wiring, its docs. Tests go with the code they cover.
+- Every commit leaves `pnpm build`, `pnpm lint` and `pnpm test` green.
